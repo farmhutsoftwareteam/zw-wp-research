@@ -1,0 +1,19 @@
+# Network + HTML
+httpx[http2]>=0.27
+dnspython>=2.6
+beautifulsoup4>=4.12
+lxml>=5.1
+
+# Browser automation (stage 06)
+playwright>=1.45
+
+# Cloud / data sources
+google-cloud-bigquery>=3.20
+
+# LLM (stages 05, 07)
+anthropic>=0.34
+
+# Utilities
+python-dotenv>=1.0
+tqdm>=4.66
+orjson>=3.10

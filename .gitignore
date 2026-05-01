@@ -1,0 +1,25 @@
+# env
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__
+*.pyc
+.venv
+venv
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# pipeline outputs (keep .gitkeep)
+data/*
+!data/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# editor / OS
+.DS_Store
+.idea
+.vscode
+*.swp
