@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Zimbabwe WordPress sites — directory</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="30">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Zimbabwe WordPress directory</h1>
+    <p class="subtitle">A research index of Zimbabwean websites running WordPress. Generated 2026-05-01 13:02:21. <span class="live-dot" title="Auto-refreshes every 30 seconds while the pipeline is live"></span></p>
+  </div>
+</header>
+
+<section class="stats wrap">
+  <div class="stat"><span class="num">2255</span><span class="lbl">WP sites</span></div>
+  <div class="stat"><span class="num">194</span><span class="lbl">verified</span></div>
+  <div class="stat"><span class="num">9</span><span class="lbl">categories</span></div>
+  <div class="stat"><span class="num">1362</span><span class="lbl">on cPanel</span></div>
+  <div class="stat"><span class="num">elementor</span><span class="lbl">most-used plugin</span></div>
+  <div class="stat"><span class="num">astra</span><span class="lbl">most-used theme</span></div>
+</section>
+
+<section class="controls wrap">
+  <input id="q" type="search" placeholder="Search domain, theme, category…" autocomplete="off">
+  <select id="category">
+    <option value="">All categories</option>
+    <option value="business">Business (538)</option><option value="education">Education (108)</option><option value="ecommerce">Ecommerce (89)</option><option value="ngo">Ngo (76)</option><option value="other">Other (69)</option><option value="government">Government (68)</option><option value="news">News (34)</option><option value="blog">Blog (28)</option><option value="religious">Religious (13)</option>
+  </select>
+  <select id="rank">
+    <option value="">Any rank</option>
+    <option value="top-1k">Top 1k</option>
+    <option value="top-10k">Top 10k</option>
+    <option value="top-100k">Top 100k</option>
+    <option value="top-1m">Top 1M</option>
+    <option value="ranked">Ranked anywhere</option>
+    <option value="unranked">Unranked</option>
+  </select>
+  <select id="panel">
+    <option value="">Any host panel</option>
+    <option value="cpanel">cpanel (1362)</option><option value="litespeed">litespeed (149)</option><option value="plesk">plesk (143)</option><option value="__none__">none / unknown (601)</option>
+  </select>
+  <label class="check"><input id="hasshot" type="checkbox"> Has screenshot</label>
+  <span id="count" class="count"></span>
+</section>
+
+<main class="wrap">
+  <table id="grid">
+    <thead>
+      <tr>
+        <th data-key="domain">Domain</th>
+        <th data-key="tranco_rank" data-num="1">Rank</th>
+        <th data-key="score" data-num="1">Score</th>
+        <th data-key="category">Category</th>
+        <th data-key="theme">Theme</th>
+        <th data-key="plugin_count" data-num="1">Plugins</th>
+        <th data-key="host_panel">Panel</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</main>
+
+<footer class="wrap">
+  <p>Source: <code>zw-wp-research</code> pipeline. Data is research-grade — false positives possible.</p>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

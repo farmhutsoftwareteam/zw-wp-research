@@ -7,13 +7,12 @@ lxml>=5.1
 # Browser automation (stage 06)
 playwright>=1.45
 
-# Cloud / data sources
-google-cloud-bigquery>=3.20
-
-# LLM (stages 05, 07)
-anthropic>=0.34
-
 # Utilities
 python-dotenv>=1.0
 tqdm>=4.66
 orjson>=3.10
+
+# NOTE: stage 05/07 LLM calls go through the `claude` CLI (Max plan) — no SDK
+#       dependency. Install Claude Code separately: https://claude.com/claude-code
+# NOTE: stage 08 uses stdlib `sqlite3` — no extra dependency.
+# NOTE: HTTP Archive on BigQuery is deferred to v2; google-cloud-bigquery dropped.

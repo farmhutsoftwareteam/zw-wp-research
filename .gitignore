@@ -12,11 +12,27 @@ venv
 .mypy_cache
 .ruff_cache
 
-# pipeline outputs (keep .gitkeep)
+# pipeline working data — large, raw, regenerable; not meant for git
 data/*
 !data/.gitkeep
+
+# pipeline reports — by default ignore everything,
+# then explicitly ALLOW the files we want to publish/share via Vercel.
 reports/*
 !reports/.gitkeep
+!reports/report.md
+!reports/top_zw_wordpress.csv
+!reports/zwwp.db
+!reports/site/
+!reports/site/**
+!reports/screenshots/
+!reports/screenshots/*.png
+
+# supervisor runtime
+logs/
+.pipeline.pid
+.live.pid
+nohup.out
 
 # editor / OS
 .DS_Store

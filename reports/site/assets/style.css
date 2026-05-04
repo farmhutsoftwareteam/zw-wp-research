@@ -1,0 +1,87 @@
+:root {
+  --fg: #1a1a1a;
+  --muted: #6b6b6b;
+  --bg: #fafafa;
+  --card: #fff;
+  --accent: #21759b; /* WP blue */
+  --border: #e5e5e5;
+  --hover: #f0f6f9;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--fg);
+  background: var(--bg);
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+header { background: #fff; border-bottom: 1px solid var(--border); padding: 28px 0 22px; }
+header h1 { margin: 0 0 4px; font-size: 22px; font-weight: 600; }
+header .subtitle { margin: 0; color: var(--muted); font-size: 13px; }
+header a { color: var(--accent); text-decoration: none; }
+header a:hover { text-decoration: underline; }
+
+.stats { display: flex; gap: 24px; flex-wrap: wrap; padding-top: 22px; padding-bottom: 8px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; min-width: 110px; }
+.stat .num { display: block; font-size: 20px; font-weight: 600; }
+.stat .lbl { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding-top: 16px; padding-bottom: 12px; }
+.controls input[type="search"], .controls select {
+  padding: 7px 10px; border: 1px solid var(--border); border-radius: 5px;
+  background: #fff; font-size: 13px;
+}
+.controls input[type="search"] { flex: 1 1 280px; min-width: 240px; }
+.controls .check { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.controls .count { margin-left: auto; color: var(--muted); font-size: 13px; }
+
+table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+thead th {
+  text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase;
+  letter-spacing: .03em; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none; background: #fafafa;
+}
+thead th[aria-sort="asc"]::after { content: " ↑"; }
+thead th[aria-sort="desc"]::after { content: " ↓"; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--hover); }
+tbody td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+tbody tr:last-child td { border-bottom: none; }
+tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody a { color: var(--accent); text-decoration: none; }
+tbody a:hover { text-decoration: underline; }
+
+.detail section { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin-top: 16px; }
+.detail h2 { margin-top: 0; font-size: 16px; }
+table.kv { box-shadow: none; border: none; }
+table.kv th { width: 160px; font-weight: 500; color: var(--muted); padding: 6px 12px 6px 0; background: transparent; text-transform: none; letter-spacing: 0; }
+table.kv td { padding: 6px 0; border: none; }
+.shot { display: block; max-width: 100%; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 16px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { background: #eef4f8; color: var(--accent); padding: 3px 8px; border-radius: 3px; font-size: 12px; }
+.tag-cpanel { background: #fff4e0; color: #a36b00; }
+.tag-plesk { background: #e0eaff; color: #1e3a8a; }
+.tag-directadmin { background: #e8f5e9; color: #1b5e20; }
+.tag-litespeed { background: #f3e5f5; color: #6a1b9a; }
+.tag-hestia { background: #ffe0e0; color: #b71c1c; }
+.tag-vesta { background: #ffe0e0; color: #b71c1c; }
+.tag-webmin { background: #ececec; color: #424242; }
+.evidence-list { font-family: ui-monospace, monospace; font-size: 12px; color: var(--muted); padding: 8px 12px; background: #fafafa; border: 1px solid var(--border); border-radius: 4px; margin-top: 10px; }
+.evidence-list span { display: inline-block; margin-right: 8px; }
+.signal-table { width: 100%; }
+.signal-table th, .signal-table td { padding: 5px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+.signal-table .yes { color: #1a7f37; font-weight: 600; }
+
+footer { color: var(--muted); font-size: 12px; padding: 28px 0 32px; }
+code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+
+.live-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #1a7f37; margin-left: 6px; vertical-align: middle;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .35; transform: scale(.8); }
+}

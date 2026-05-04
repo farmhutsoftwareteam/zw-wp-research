@@ -1,21 +1,35 @@
 # zw-wp-research pipeline
 #
 # Usage:
-#   make all        # run the full pipeline (1 -> 7)
+#   make all        # run the full pipeline (1 -> 9): seeds, dns, detect, enrich,
+#                   #   classify, verify, report, index, site
 #   make seeds      # just stage 01
 #   make detect     # stages 01..03
-#   make enrich     # stages 01..05
+#   make enrich     # stages 01..04
+#   make classify   # stages 01..05
+#   make verify     # stages 01..06
 #   make report     # stages 01..07
+#   make index      # stage 08 (build SQLite from JSONL)
+#   make site       # stage 09 (build static site from SQLite)
+#   make serve      # start local http server to browse the site
 #   make clean      # wipe data/ and reports/ (keeps .gitkeep)
+#
+# Lid-safe variants (wraps with `caffeinate -i` so the laptop doesn't sleep):
+#   make seeds-awake  detect-awake  enrich-awake  classify-awake
+#   make verify-awake report-awake  index-awake   site-awake  all-awake
 
 PY := python3
 SCRIPTS := scripts
+SITE_DIR := reports/site
 
-.PHONY: all seeds dns detect enrich verify report clean help
+.PHONY: all seeds dns detect panels enrich classify verify report index site serve clean help \
+        detect-parallel
 
 help:
-	@echo "Targets: seeds dns detect enrich verify report all clean"
+	@echo "Targets: seeds dns detect enrich classify verify report index site serve all clean"
+	@echo "Lid-safe: append -awake (e.g. all-awake) to wrap any target with caffeinate -i"
 
+# --- Pipeline ---
 seeds: data/seeds.jsonl
 data/seeds.jsonl:
 	$(PY) $(SCRIPTS)/01_seed_harvester.py
@@ -34,6 +48,10 @@ detect-parallel: data/live.jsonl
 	  $(PY) $(SCRIPTS)/03_wp_detector.py --shard $$i/8 & \
 	done; wait
 
+panels: data/panels.jsonl
+data/panels.jsonl: data/detections.jsonl
+	$(PY) $(SCRIPTS)/03b_panel_fingerprinter.py
+
 enrich: data/enriched.jsonl
 data/enriched.jsonl: data/detections.jsonl
 	$(PY) $(SCRIPTS)/04_traffic_enricher.py
@@ -50,10 +68,94 @@ report: reports/report.md
 reports/report.md: data/verified.jsonl
 	$(PY) $(SCRIPTS)/07_reporter.py
 
-all: report
+index: reports/zwwp.db
+reports/zwwp.db: reports/report.md data/panels.jsonl
+	$(PY) $(SCRIPTS)/08_indexer.py
+
+site: $(SITE_DIR)/index.html
+$(SITE_DIR)/index.html: reports/zwwp.db
+	$(PY) $(SCRIPTS)/09_site_builder.py
+
+serve:
+	@echo "Open http://localhost:8000"
+	$(PY) -m http.server 8000 -d $(SITE_DIR)
+
+all: site
 
 clean:
 	@find data -type f ! -name '.gitkeep' -delete
 	@find reports -type f ! -name '.gitkeep' -delete
 	@find reports -mindepth 1 -type d -empty -delete
 	@echo "Cleaned data/ and reports/"
+
+# --- Long-running supervisor ---
+# `make run`     foreground, lid-safe, retries with backoff per stage
+# `make run-bg`  detaches, survives terminal close; writes .pipeline.pid
+# `make tail`    follow latest log
+# `make status`  snapshot of progress, top WP sites, supervisor PID
+# `make stop`    kill the bg supervisor
+
+PIDFILE := .pipeline.pid
+
+.PHONY: run run-bg tail status stop
+
+run:
+	caffeinate -i bash scripts/run_pipeline.sh
+
+run-bg:
+	@if [ -f $(PIDFILE) ] && kill -0 $$(cat $(PIDFILE)) 2>/dev/null; then \
+		echo "supervisor already running (PID $$(cat $(PIDFILE))). Use 'make stop' first."; exit 1; \
+	fi
+	@mkdir -p logs
+	@nohup caffeinate -i bash scripts/run_pipeline.sh > logs/supervisor.out 2>&1 & \
+		echo $$! > $(PIDFILE); \
+		echo "supervisor started PID $$(cat $(PIDFILE)). 'make tail' to follow, 'make status' for snapshot."
+
+tail:
+	@if [ -L logs/pipeline-latest.log ]; then \
+		tail -F "logs/$$(readlink logs/pipeline-latest.log)"; \
+	else echo "no log yet"; fi
+
+status:
+	@bash scripts/status.sh
+
+stop:
+	@if [ -f $(PIDFILE) ]; then \
+		PID=$$(cat $(PIDFILE)); \
+		if kill -0 $$PID 2>/dev/null; then \
+			kill $$PID && echo "stopped supervisor PID $$PID"; \
+		else echo "PID $$PID not running"; fi; \
+		rm -f $(PIDFILE); \
+	else echo "no PID file ($(PIDFILE))"; fi
+
+# --- Live rebuild (auto-rebuild SQLite + static site every 30s) ---
+LIVE_PIDFILE := .live.pid
+
+.PHONY: live live-bg live-stop
+
+live:
+	bash scripts/live_rebuild.sh
+
+live-bg:
+	@if [ -f $(LIVE_PIDFILE) ] && kill -0 $$(cat $(LIVE_PIDFILE)) 2>/dev/null; then \
+		echo "live-rebuild already running (PID $$(cat $(LIVE_PIDFILE)))"; exit 1; \
+	fi
+	@mkdir -p logs
+	@nohup bash scripts/live_rebuild.sh > logs/live-rebuild.out 2>&1 & \
+		echo $$! > $(LIVE_PIDFILE); \
+		echo "live-rebuild started PID $$(cat $(LIVE_PIDFILE)). 'tail -F logs/live-rebuild.log' to follow."
+
+live-stop:
+	@if [ -f $(LIVE_PIDFILE) ]; then \
+		PID=$$(cat $(LIVE_PIDFILE)); \
+		if kill -0 $$PID 2>/dev/null; then \
+			kill $$PID && echo "stopped live-rebuild PID $$PID"; \
+		else echo "PID $$PID not running"; fi; \
+		rm -f $(LIVE_PIDFILE); \
+	else echo "no PID file ($(LIVE_PIDFILE))"; fi
+
+# --- Lid-safe wrappers ---
+# Pattern rule: any "<target>-awake" runs the underlying target wrapped with
+# `caffeinate -i` so the Mac doesn't sleep mid-run.
+%-awake:
+	caffeinate -i $(MAKE) $*
