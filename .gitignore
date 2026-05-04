@@ -25,8 +25,6 @@ reports/*
 !reports/zwwp.db
 !reports/site/
 !reports/site/**
-!reports/screenshots/
-!reports/screenshots/*.png
 
 # supervisor runtime
 logs/
@@ -39,3 +37,4 @@ nohup.out
 .idea
 .vscode
 *.swp
+.vercel

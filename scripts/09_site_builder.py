@@ -26,7 +26,9 @@ from lib.config import reports_dir  # noqa: E402
 
 DEFAULT_DB = reports_dir() / "zwwp.db"
 DEFAULT_SITE_DIR = reports_dir() / "site"
-SCREENSHOT_SRC = reports_dir() / "screenshots"
+# Screenshots now live directly inside the site directory (no symlink) so that
+# Vercel/static hosts serve them correctly. Stage 06 writes here directly.
+SCREENSHOT_SRC = reports_dir() / "site" / "screenshots"
 
 
 # -----------------------------
@@ -571,17 +573,8 @@ def build(db_path: Path, site_dir: Path, top_n: int | None) -> dict[str, int]:
     (site_dir / "assets" / "style.css").write_text(STYLE_CSS, encoding="utf-8")
     (site_dir / "assets" / "app.js").write_text(APP_JS, encoding="utf-8")
 
-    # Mirror screenshots into the site so http.server can serve them
-    if SCREENSHOT_SRC.exists():
-        dest = site_dir / "screenshots"
-        if dest.exists() and not dest.is_symlink():
-            shutil.rmtree(dest)
-        if not dest.exists():
-            try:
-                dest.symlink_to(SCREENSHOT_SRC.resolve(), target_is_directory=True)
-            except OSError:
-                # Fall back to copy if symlinks aren't supported
-                shutil.copytree(SCREENSHOT_SRC, dest)
+    # Screenshots already live at reports/site/screenshots/ (stage 06 writes
+    # there directly), so no copy or symlink is needed.
 
     # index.html
     meta = _q_meta(conn)

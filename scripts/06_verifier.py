@@ -25,7 +25,7 @@ from lib.jsonl import append_record, iter_records, read_existing_keys  # noqa: E
 
 CLASSIFIED_PATH = data_dir() / "classified.jsonl"
 VERIFIED_PATH = data_dir() / "verified.jsonl"
-SCREENSHOT_DIR = reports_dir() / "screenshots"
+SCREENSHOT_DIR = reports_dir() / "site" / "screenshots"
 
 
 THEME_PATH_RE = re.compile(r"/wp-content/themes/([\w\-]+)", re.IGNORECASE)
