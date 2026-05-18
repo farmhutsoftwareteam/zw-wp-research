@@ -129,10 +129,27 @@ SIGNAL_WEIGHTS = {
 
 def build(db_path: Path) -> dict[str, int]:
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    if db_path.exists():
-        db_path.unlink()
+    # Don't unlink the DB — that would drop contacts/channels/outreach_history
+    # written by stages 14+ that must survive a re-index. Instead drop only
+    # the derived tables this stage owns.
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.executescript(SCHEMA)
+    # Make sure the lead-gen schema (contacts / channels / outreach_history /
+    # claims / suppressions) exists alongside the derived tables.
+    try:
+        from importlib import util as _imp_util
+        spec = _imp_util.spec_from_file_location(
+            "_schema14",
+            Path(__file__).parent / "14_contacts_schema.py",
+        )
+        if spec and spec.loader:
+            mod = _imp_util.module_from_spec(spec)
+            spec.loader.exec_module(mod)  # type: ignore[union-attr]
+            mod.ensure_schema(conn)
+    except Exception as exc:  # pragma: no cover
+        print(f"[index] warning: could not ensure lead-gen schema: {exc}",
+              file=__import__("sys").stderr)
 
     counts = {
         "seeds": 0,

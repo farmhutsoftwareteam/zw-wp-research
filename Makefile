@@ -52,6 +52,35 @@ panels: data/panels.jsonl
 data/panels.jsonl: data/detections.jsonl
 	$(PY) $(SCRIPTS)/03b_panel_fingerprinter.py
 
+# --- Lead-gen enrichment (epic #10 — runs after the main pipeline lands) ---
+schema:
+	$(PY) $(SCRIPTS)/14_contacts_schema.py --backfill
+
+leadgen-dns:
+	$(PY) $(SCRIPTS)/15_dns_contacts.py
+
+leadgen-wp:
+	$(PY) $(SCRIPTS)/16_wp_authors.py
+
+leadgen-whois:
+	$(PY) $(SCRIPTS)/17_whois_enrich.py
+
+leadgen-deep:
+	$(PY) $(SCRIPTS)/18_deep_scrape.py
+
+leadgen-pindula:
+	$(PY) $(SCRIPTS)/19_pindula_enrich.py
+
+leadgen-finder:
+	$(PY) $(SCRIPTS)/20_finder_enrich.py
+
+leadgen: schema leadgen-dns leadgen-wp leadgen-whois leadgen-deep leadgen-pindula leadgen-finder
+	@echo "leadgen enrichment complete"
+
+# review-serve already exists for the dashboard; agent-smoke is for ops
+agent-smoke:
+	$(PY) $(SCRIPTS)/21_agent_smoke.py --stats
+
 enrich: data/enriched.jsonl
 data/enriched.jsonl: data/detections.jsonl
 	$(PY) $(SCRIPTS)/04_traffic_enricher.py
@@ -79,6 +108,18 @@ $(SITE_DIR)/index.html: reports/zwwp.db
 serve:
 	@echo "Open http://localhost:8000"
 	$(PY) -m http.server 8000 -d $(SITE_DIR)
+
+# Local-only engagement review dashboard (NOT pushed to Vercel)
+review: reports/review/index.html
+reports/review/index.html: reports/cpanel_advisory.csv reports/cpanel_version_audit.csv
+	$(PY) $(SCRIPTS)/13_review_dashboard.py
+	@echo ""
+	@echo "Open: file://$(abspath reports/review/index.html)"
+	@echo "Or:   python -m http.server 8001 -d reports/review/  (then http://localhost:8001/)"
+
+review-serve: review
+	@echo "Engagement review at http://localhost:8001"
+	$(PY) -m http.server 8001 -d reports/review/
 
 all: site
 

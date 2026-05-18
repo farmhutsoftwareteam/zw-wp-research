@@ -26,6 +26,14 @@ reports/*
 !reports/site/
 !reports/site/**
 
+# engagement / advisory artifacts — KEEP LOCAL ONLY, never publish
+reports/cpanel_advisory.csv
+reports/cpanel_advisory.md
+reports/cpanel_version_audit.csv
+reports/cpanel_version_summary.md
+reports/cpanel_urgent_compromised.csv
+reports/review/
+
 # supervisor runtime
 logs/
 .pipeline.pid
