@@ -4,7 +4,7 @@
   "installCommand": "true",
   "outputDirectory": "reports/site",
   "framework": null,
-  "trailingSlash": false,
+  "trailingSlash": true,
   "headers": [
     {
       "source": "/(.*)",
