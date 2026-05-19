@@ -17,6 +17,8 @@ Two problems chained together:
 
 Once both problems are solved per-domain, we enrich (traffic rank, category) and verify (visual + plugin/theme fingerprint) the top results.
 
+The project then extends into **lead generation** for outreach: contact-info enrichment (DNS / WHOIS / WP authors / sitemap / Pindula / paid finders), salability signals (freshness, SSL expiry, vulnerabilities, page-speed, domain age), an agent-facing schema (`contacts` / `channels` / `outreach_history` / `claims` / `suppressions`), and sales-ready pitch cards generated via `claude -p`. See **Lead generation** section below.
+
 ## The pipeline
 
 ```
@@ -75,6 +77,53 @@ open http://localhost:8000
 ```
 
 The site is fully static — same files deploy to Cloudflare Pages, GitHub Pages, or Netlify with no extra build step.
+
+## Lead generation (stages 14–29)
+
+Once the detection + verification pipeline lands a list of WordPress sites, the lead-gen track turns the list into an outreach database that downstream agents (Gmail MCP, Vapi, ElevenLabs) can work autonomously.
+
+```
+contacts ⨯ channels ⨯ outreach_history ⨯ claims ⨯ suppressions
+       └── pagespeed ⨯ vulnerabilities ⨯ freshness ⨯ ssl_expiry ⨯ domain_age
+              └── qualified_leads view ── pitch_cards/*.md
+```
+
+| # | Script | Job |
+|---|---|---|
+| 14 | `14_contacts_schema.py` | Idempotent migration + CSV backfill |
+| 15 | `15_dns_contacts.py` | SOA admin email + DMARC ruf/rua + MX provider |
+| 16 | `16_wp_authors.py` | `/wp-json/wp/v2/users` + `/feed/` + oEmbed authors |
+| 17 | `17_whois_enrich.py` | RDAP / Whoxy / Who-Dat (note: no public WHOIS for `.zw`) |
+| 18 | `18_deep_scrape.py` | sitemap.xml → /about / /contact / /privacy / /team |
+| 19 | `19_pindula_enrich.py` | pindula.co.zw wiki infoboxes |
+| 20 | `20_finder_enrich.py` | Hunter / Apollo / Snov / Tomba rotator (free tiers) |
+| 21 | `21_agent_smoke.py` | peek / claim / release / record-touch CLI |
+| 22 | `22_suppress.py` | Manual opt-out store CLI |
+| 23 | `23_freshness.py` | Last-post `<pubDate>` from /feed/ |
+| 24 | `24_ssl_expiry.py` | TLS cert `notAfter` + days_remaining |
+| 26 | `26_wayback.py` | archive.org first snapshot (domain-age proxy) |
+| 27 | `27_pagespeed.py` | Google PSI mobile + desktop (gated on key) |
+| 28 | `28_wpscan.py` | Plugin CVE lookup (gated on key) |
+| 29 | `29_pitch_cards.py` | Per-lead markdown card via `claude -p` |
+
+### Quick start
+
+```bash
+make schema             # ensure lead-gen tables exist (idempotent)
+make leadgen            # run stages 15-19 (DNS, WP, WHOIS, deep, Pindula)
+make leadgen-sales      # run stages 23, 24, 26, 27, 28, 29 (sales signals + cards)
+make pitch-open         # open the top-50 pitch-card index in your editor
+```
+
+### Agent integration
+
+The `contacts_for_agent` SQL view + atomic `claim_domain` + `record_touch` helpers let downstream agents work the dataset concurrently without races. See `scripts/lib/agent_api.py` and `scripts/21_agent_smoke.py`.
+
+The `qualified_leads` view ranks every WP-positive cPanel site on a 0–100 `lead_score` (has_phone + has_email + named_human + active_90d + vuln_count + ssl_expiry + Tranco_rank + Pindula).
+
+### Privacy / scope
+
+The lead-gen artifacts (contact lists, pitch cards, advisory CSVs, review dashboard) are **gitignored** — they don't ship to the public Vercel site. They live in `reports/` on disk only. The public site continues to show only the original WP-detection directory, no contact data.
 
 ## Discovery sources (stage 01)
 

@@ -77,6 +77,32 @@ leadgen-finder:
 leadgen: schema leadgen-dns leadgen-wp leadgen-whois leadgen-deep leadgen-pindula leadgen-finder
 	@echo "leadgen enrichment complete"
 
+# Sales-enablement enrichment (epic #10 follow-on)
+leadgen-fresh:
+	$(PY) $(SCRIPTS)/23_freshness.py
+
+leadgen-ssl:
+	$(PY) $(SCRIPTS)/24_ssl_expiry.py
+
+leadgen-wayback:
+	$(PY) $(SCRIPTS)/26_wayback.py
+
+leadgen-psi:
+	$(PY) $(SCRIPTS)/27_pagespeed.py --top-n 200
+
+leadgen-wpscan:
+	$(PY) $(SCRIPTS)/28_wpscan.py
+
+pitch-cards:
+	$(PY) $(SCRIPTS)/29_pitch_cards.py --top-n 50
+
+pitch-open:
+	open reports/pitch_cards/index.md
+
+leadgen-sales: leadgen-fresh leadgen-ssl leadgen-wayback leadgen-psi leadgen-wpscan pitch-cards
+	@echo "sales-enablement enrichment complete"
+	@echo "open reports/pitch_cards/index.md to see the top 50 leads"
+
 # review-serve already exists for the dashboard; agent-smoke is for ops
 agent-smoke:
 	$(PY) $(SCRIPTS)/21_agent_smoke.py --stats
