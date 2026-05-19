@@ -100,6 +100,66 @@ CREATE INDEX IF NOT EXISTS idx_suppressions_phone ON suppressions(phone) WHERE p
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_channel_value_per_contact
     ON channels(contact_id, kind, value);
+
+-- Enrichment 2.0 (stages 23–29): freshness, SSL, domain-age, perf, vulns
+CREATE TABLE IF NOT EXISTS pagespeed (
+    id INTEGER PRIMARY KEY,
+    domain TEXT NOT NULL,
+    strategy TEXT NOT NULL CHECK(strategy IN ('mobile','desktop')),
+    performance REAL,
+    accessibility REAL,
+    best_practices REAL,
+    seo REAL,
+    lcp_ms INTEGER,
+    cls REAL,
+    tbt_ms INTEGER,
+    fetched_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_pagespeed_domain ON pagespeed(domain);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_pagespeed_per_strategy
+    ON pagespeed(domain, strategy);
+
+CREATE TABLE IF NOT EXISTS vulnerabilities (
+    id INTEGER PRIMARY KEY,
+    domain TEXT NOT NULL,
+    component_type TEXT NOT NULL CHECK(component_type IN ('wp_core','plugin','theme')),
+    component TEXT NOT NULL,
+    version TEXT,
+    cve TEXT,
+    title TEXT,
+    severity TEXT,
+    fixed_in TEXT,
+    published_at TEXT,
+    fetched_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_vuln_domain ON vulnerabilities(domain);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_vuln_unique
+    ON vulnerabilities(domain, component_type, component, cve);
+
+CREATE TABLE IF NOT EXISTS freshness (
+    domain TEXT PRIMARY KEY,
+    last_post_at TEXT,
+    posts_last_90d INTEGER,
+    feed_url TEXT,
+    fetched_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ssl_expiry (
+    domain TEXT PRIMARY KEY,
+    not_before TEXT,
+    not_after TEXT,
+    days_remaining INTEGER,
+    issuer_cn TEXT,
+    fetched_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_ssl_days ON ssl_expiry(days_remaining);
+
+CREATE TABLE IF NOT EXISTS domain_age (
+    domain TEXT PRIMARY KEY,
+    first_archived_at TEXT,
+    snapshots_count INTEGER,
+    fetched_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 

@@ -33,6 +33,7 @@ reports/cpanel_version_audit.csv
 reports/cpanel_version_summary.md
 reports/cpanel_urgent_compromised.csv
 reports/review/
+reports/pitch_cards/
 
 # supervisor runtime
 logs/
