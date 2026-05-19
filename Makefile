@@ -96,8 +96,22 @@ leadgen-wpscan:
 pitch-cards:
 	$(PY) $(SCRIPTS)/29_pitch_cards.py --top-n 50
 
+pitch-html: pitch-cards
+	$(PY) $(SCRIPTS)/30_pitch_html.py
+
 pitch-open:
 	open reports/pitch_cards/index.md
+
+pitch-serve: pitch-html
+	@echo "Local pitch-card viewer at http://localhost:8002"
+	$(PY) -m http.server 8002 -d reports/pitch_html/
+
+# Build a self-contained engagement-kit zip for a colleague
+share-bundle: pitch-html
+	$(PY) $(SCRIPTS)/31_share_bundle.py
+	@echo ""
+	@echo "Upload the zip to Google Drive / Dropbox / WeTransfer; share the link with your colleague."
+	@echo "They unzip, double-click OPEN_THIS_FIRST.html, and they have everything offline."
 
 leadgen-sales: leadgen-fresh leadgen-ssl leadgen-wayback leadgen-psi leadgen-wpscan pitch-cards
 	@echo "sales-enablement enrichment complete"

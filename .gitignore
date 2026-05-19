@@ -34,6 +34,9 @@ reports/cpanel_version_summary.md
 reports/cpanel_urgent_compromised.csv
 reports/review/
 reports/pitch_cards/
+reports/pitch_html/
+reports/share/
+reports/share-bundle-*.zip
 
 # supervisor runtime
 logs/
@@ -47,3 +50,11 @@ nohup.out
 .vscode
 *.swp
 .vercel
+
+# Engagement kit published to Vercel (added by _publish_engagement_to_vercel.sh)
+!reports/site/pitch/
+!reports/site/pitch/**
+!reports/site/review/
+!reports/site/review/**
+!reports/site/share/
+!reports/site/share/**

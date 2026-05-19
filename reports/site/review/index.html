@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>cPanel engagement review (PRIVATE)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="review.css">
+</head>
+<body>
+<div class="banner">
+  <strong>PRIVATE — INTERNAL ENGAGEMENT REVIEW</strong>
+  <span>Do not share this URL or screenshot. Contact data on this page is for outreach planning only.</span>
+</div>
+<header>
+  <div class="wrap">
+    <h1>cPanel engagement — review &amp; selection</h1>
+    <p class="subtitle">CVE-2026-41940 outreach prep for 690 cPanel-positive Zimbabwean WordPress sites.</p>
+  </div>
+</header>
+
+<section class="stats wrap">
+  <div class="stat"><span class="num">690</span><span class="lbl">cPanel sites</span></div>
+  <div class="stat"><span class="num">346</span><span class="lbl">with email</span></div>
+  <div class="stat"><span class="num">421</span><span class="lbl">with phone</span></div>
+  <div class="stat warn"><span class="num">47</span><span class="lbl">outdated WP</span></div>
+  <div class="stat danger"><span class="num">0</span><span class="lbl">compromise indicators</span></div>
+  <div class="stat" id="selectedStat"><span class="num" id="selectedCount">0</span><span class="lbl">selected</span></div>
+</section>
+
+<section class="controls wrap">
+  <input id="q" type="search" placeholder="Search domain / theme / email / phone…" autocomplete="off">
+  <select id="category">
+    <option value="">All categories</option>
+    <option value="business">Business (392)</option><option value="education">Education (69)</option><option value="ecommerce">Ecommerce (59)</option><option value="ngo">Ngo (53)</option><option value="other">Other (43)</option><option value="government">Government (28)</option><option value="blog">Blog (21)</option><option value="news">News (17)</option><option value="religious">Religious (8)</option>
+  </select>
+  <select id="http_server">
+    <option value="">All HTTP servers</option>
+    <option value="apache">apache (343)</option><option value="litespeed">litespeed (124)</option><option value="nginx">nginx (54)</option>
+  </select>
+  <label class="check"><input id="hasemail" type="checkbox"> Has email</label>
+  <label class="check"><input id="hasphone" type="checkbox"> Has phone</label>
+  <label class="check"><input id="outdatedonly" type="checkbox"> Outdated only</label>
+  <label class="check"><input id="compronly" type="checkbox"> Compromised only</label>
+  <label class="check"><input id="hidesuppr" type="checkbox" checked> Hide suppressed</label>
+  <span id="count" class="count"></span>
+</section>
+
+<section class="actions wrap">
+  <button id="selectAll" type="button">Select all visible</button>
+  <button id="selectNone" type="button">Clear selection</button>
+  <button id="exportCsv" type="button">Export selected → CSV</button>
+  <button id="exportJson" type="button">Export selected → JSON (mail-merge)</button>
+  <button id="copyEmails" type="button">Copy selected emails to clipboard</button>
+</section>
+
+<main class="wrap">
+  <table id="grid">
+    <thead>
+      <tr>
+        <th class="check-col"><input id="selAll2" type="checkbox" title="Select all visible"></th>
+        <th data-key="domain">Domain</th>
+        <th data-key="tranco_rank" data-num="1">Rank</th>
+        <th data-key="category">Category</th>
+        <th data-key="http_server">Server</th>
+        <th data-key="wp_version">WP</th>
+        <th data-key="outdated_flags">Flags</th>
+        <th data-key="email">Email</th>
+        <th data-key="phones">Phone</th>
+        <th>Live</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</main>
+
+<footer class="wrap">
+  <p>Sources: cpanel_advisory.csv (contact scrape) · cpanel_version_audit.csv (version analysis) · zwwp.db (SQLite) · compromise_check.jsonl (if present).</p>
+</footer>
+
+<script src="review.js"></script>
+</body>
+</html>
